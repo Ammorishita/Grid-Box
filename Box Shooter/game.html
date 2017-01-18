@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Title of the document</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="css/gamestyle.css">
+</head>
+
+<body>
+<div class="grid">
+	<div class="instructions">
+		<p>Destroy the moving red box. Use the arrow keys to move and space bar to fire.</p>
+	</div>
+	<div class="box">
+		<p>Player</p>
+	</div>
+	<div class="enemy">
+		<p>Enemy</p>
+	</div>
+</div>
+<div class="menu">
+
+	<div class="health">	
+		<div class="players">
+			<p>Lives</p>
+			<p style="color: red">Red Box</p>
+		</div>
+		<div class="lives">
+		<div class="playerHealth">
+			<div class="miniBox"> </div>
+			<div class="miniBox"> </div>
+			<div class="miniBox"> </div>			
+		</div>
+		<div class="enemyHealth">
+			<div class="redBox">
+			</div>
+		</div>
+		</div>
+	</div>
+	<div class="submenu score">
+		<p>Score</p>
+	</div>
+	<div class="submenu gameplay">
+		<p>Gameplay</p>
+	</div>
+</div>
+
+	<script src="js/libs/jquery-3.1.0.min.js"></script>
+	<script src="js/game.js"></script>
+</body>
+
+</html>
