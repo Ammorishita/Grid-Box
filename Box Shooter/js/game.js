@@ -29,7 +29,9 @@ var weapons2 = [
 var levelUp = [
     {
         'speed' : 400,
-        'level' : 1
+        'level' : 1,
+        'pause' : true,
+        'gameover' : false
     }
 ];
 
@@ -41,12 +43,10 @@ function checkKey(e) {
 
     if (e.keyCode == '38') {
         $('.box').css({'top' : '-=100px'});
-        console.log($('.box').css('top'));
         //up arrow
     }
     else if (e.keyCode == '40') {
         $('.box').css({'top' : '+=100px'});
-        console.log($('.box').css('top'));
         //down arrow
     }
     else if (e.keyCode == '37') {
@@ -55,7 +55,6 @@ function checkKey(e) {
     }
     else if (e.keyCode == '39') {
         $('.box').css({'left' : '+=100px'});
-        console.log($('.box').css('left'));
         //right arrow
     }
     game.collision();
@@ -71,7 +70,9 @@ var game = {
         this.menu();
         this.player();
         this.weapon();
-        //this.difficulty();
+    },
+    test: function() {
+        levelUp[0].pause = false;
     },
     menu: function() {
         $('.gameplay').click(function() {
@@ -80,10 +81,13 @@ var game = {
             if (clicks) {
             // odd clicks
                 pause = false;
+                levelUp[0].pause = false;
+                game.test();
                 $('.instructions').fadeToggle();
             } else {
             // even clicks
                 pause = true;
+                levelUp[0].pause = true;
                 $('.instructions').fadeToggle();
             }
             $(this).data("clicks", !clicks);
@@ -104,21 +108,20 @@ var game = {
         function attacking(e) {
             if (e.keyCode == '32') {
                 document.removeEventListener('keydown', attacking, false);
-                var box = document.querySelector('.box');
-                var posY = box.style.top;
-                var posX = box.style.left;
                 var projectile = $('<div>', {
                     'class' : 'gridBoxMini'
                 });
                 var sprite = $('<div>', {
                     'class' : 'weapon'
                 });
-                var stylesTop = window.getComputedStyle(box, null).getPropertyValue('top');
+                var box = document.querySelector('.box');
+                var styleTop = window.getComputedStyle(box, null).getPropertyValue('top');
+                var styleLeft = window.getComputedStyle(box, null).getPropertyValue('left');
                 projectile.prepend('<img class="weapon2">');
-                sprite[0].style.top = stylesTop;
-                sprite[0].style.left = posX;
-                projectile[0].style.top = stylesTop;
-                projectile[0].style.left = posX;
+                sprite[0].style.top = styleTop;
+                sprite[0].style.left = styleLeft;
+                projectile[0].style.top = styleTop;
+                projectile[0].style.left = styleLeft;
                 $('.grid').append(projectile);
                 $('.grid').append(sprite);
                 var interval = setInterval(function() {
@@ -146,7 +149,6 @@ var game = {
     },
     enemy: function() {
         var enemy = $('.enemy');
-        enemy.css({'background-color' : 'red'});
             enemyX = $('.enemy').css('left');
             enemyY = $('.enemy').css('top');
         var timer = setInterval(function() {
@@ -181,15 +183,23 @@ var game = {
                     if (attack2 == 1) {enemy.css({'left' : '+=100px'})};
                     if (attack2 == 2) {enemy.css({'left' : '-=100px'})};
                     game.collision();
+                    var gameOver = levelUp[0].gameover;
+                    if(gameOver) {
+                        clearInterval(slide)
+                        enemy.css({'background-color' : 'red'});
+                        game.enemy();
+                        levelUp[0].gameover = false;
+                    }
                     var enemyPosX = parseInt(enemyX);
                     if(enemyPosX == 900 || enemyPosX == 0) {
                         clearInterval(slide);
+                        enemy.css({'background-color' : 'red'});
                         game.enemy();
                     }   
                 },150);
             };
-            if (attack > .90) {
-                var attack2 = Math.floor(Math.random()*10);
+            if (attack > .50) {
+                var attack2 = Math.floor(Math.random()*4);
                 if(attack2 == 1 && enemyPosX < 900) {
                     normalAttack();
                 }
@@ -199,26 +209,52 @@ var game = {
             }
         };
     },
+    reset: function() {
+        setTimeout(function() {
+            $('.notification').animate({
+                'opacity' : '1'
+            },500);
+            setTimeout(function() {
+                $('.notification').animate({
+                    'opacity' : '0'
+                },500)
+            },1000)
+            $('.score').html('<p class="score">' + 1 + '</p>');
+            $('.enemy').css({
+                'left' : '900px',
+                'top' : '300px'
+            });
+            $('.redBox').css({
+                'width' : '150px'
+            });
+            $('.box').css({
+                'top' : '300px',
+                'left' : '0px'
+            });
+            pause = true;
+            levelUp[0].pause = true;
+            levelUp[0].speed = 400;
+            for ( var i=0; i<3; i++) {
+            var lives = $('<div>', {
+                'class' : 'miniBox'
+            });
+            $('.playerHealth').append(lives);
+            }
+        },100)
+    },
     collision: function() {
         weaponY = $('.gridBoxMini').css('top');
         weaponX = $('.gridBoxMini').css('left');
         enemyY = $('.enemy').css('top');
-        boxY = $('.box').css('top');
         enemyX = $('.enemy').css('left');
+        boxY = $('.box').css('top');
         boxX = $('.box').css('left');
         if (boxY == enemyY && boxX == enemyX) {
             console.log('COLLISION');
-            var lose = $('.playerHealth').find('.miniBox').length
+            var lose = $('.playerHealth').find('.miniBox').length;
             if(lose == 1) {
-                setTimeout(function() {
-                    alert('you lose')
-                    for ( var i=0; i<3; i++) {
-                    var lives = $('<div>', {
-                        'class' : 'miniBox'
-                    });
-                    $('.playerHealth').append(lives);
-                    }
-                })
+                game.reset();
+                levelUp[0].gameover = true;
             }
             console.log(lose)
             var lives = document.querySelector('.miniBox');
@@ -229,14 +265,32 @@ var game = {
             $('.redBox').css({
                 'width' : '-=50px'
             })
+            if(levelUp[0].pause === true) {
+                $('.redBox').css({
+                    'width' : '+=50px'
+                })
+                console.log(levelUp[0].pause)
+            }
             var enemyHealth = $('.redBox').css('width');
             var enemyHealthInt = parseInt(enemyHealth);
             if(enemyHealthInt == 0) {
                 var speed = levelUp[0].speed;
+                var level = levelUp[0].level;
+                var currentLevel = level += 1;
                 var speed2 = speed -= 50;
+                levelUp[0].level = currentLevel;
                 levelUp[0].speed = speed2;
+                $('.score').html('<p class="score">' + currentLevel + '</p>');
+                $('.enemy').css({
+                    'left' : '900px',
+                    'top' : '300px'
+                });
+                $('.box').css({
+                    'top' : '300px',
+                    'left' : '0px'
+                });
                 setTimeout(function() {
-                    alert('You have won')
+                    alert('You have cleared this level.')
                     $('.redBox').css({
                         'width' : '150px'
                     })
