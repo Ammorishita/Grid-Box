@@ -7,24 +7,20 @@ $(document).ready(function() {
     }
     pause = true;
 });
+
 var weapons2 = [
     {   
         'title' : 'Energy Weapon',
-        'src' : 'images/Energy Ball.png'
+        'src' : 'images/Flame1.png'
     },
     {   
         'title' : 'Energy Weapon',
-        'src' : 'images/Energy Ball2.png'
+        'src' : 'images/Flame2.png'
     },
     {   
         'title' : 'Energy Weapon',
-        'src' : 'images/Energy Ball3.png'
-    },
-    {   
-        'title' : 'Energy Weapon',
-        'src' : 'images/Energy Ball4.png'
-    },
-
+        'src' : 'images/Flame3.png'
+    }
 ];
 var orb = [
     {
@@ -39,7 +35,7 @@ var orb = [
         'title' : 'Orb weapon',
         'src' : 'images/Lightning3.png'
     },
-]
+];
 var effects = [
     {
         'title' : 'Explosion',
@@ -74,6 +70,24 @@ var levelUp = [
         'gameover' : false
     }
 ];
+function preloadImages(src, imgs) {
+    var img;
+    var remaining = src.length;
+    for (var i = 0; i < src.length; i++) {
+        img = new Image();
+        img.onload = function() {
+            --remaining;
+            if (remaining <= 0) {
+                //callback()
+            }
+        };
+        img.src = src[i].src;
+        imgs.push(img);
+    }
+}
+var images = [];
+preloadImages(effects, images);
+preloadImages(orb, images);
 
 document.onkeydown = checkKey;
 
@@ -136,9 +150,11 @@ var game = {
     weapon: function() {
         var count = 0;
         setInterval(function() {
-            $('.weapon2').attr('src', weapons2[count].src);
+            $('.weapon2').attr({
+                'src' : weapons2[count].src, 
+                'height' : 100});
             count++;
-            if(count > 3) {
+            if(count > 2) {
                 count = 0;
             }
         },80);
@@ -237,6 +253,7 @@ var game = {
                     var count = 0;
                     var animation = setInterval(function() {
                         $('.orb').attr('src', orb[count].src);
+                        console.log('the count' + count)
                         count++;
                         if(count > 2) {
                             count = 0;
@@ -357,7 +374,6 @@ var game = {
                     'left' : '0px'
                 });
                 setTimeout(function() {
-                    alert('You have cleared this level.')
                     $('.redBox').css({
                         'width' : '150px'
                     })
@@ -387,5 +403,5 @@ var game = {
             $('.box').css({'top' : '-=100px'});
         }
     }
-}
+};
 game.init();

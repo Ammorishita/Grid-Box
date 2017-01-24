@@ -10,7 +10,9 @@
 <body>
 <div class="grid">
 	<div class="instructions">
-		<p>Destroy the moving red box. You will lose health if you come into contact with the red box. Use the arrow keys to move and space bar to fire.  The box will move faster with each level.</p>
+		<p>Destroy the enemy orb. You will lose health if you come into contact with the orb. Use the arrow keys to move and space bar to fire.  The orb will move faster with each level.<br>
+		You will be unable to move for a brief period after firing.
+		</p>
 	</div>
 	<div class="box">
 	<img src="images/Hazard Orb.png" alt="">
@@ -25,28 +27,59 @@
 </div>
 <div class="menu">
 
-	<div class="health">	
-		<div class="players">
-			<p>Lives</p>
-			<p style="color: red">Red Box</p>
-		</div>
-		<div class="lives">
-		<div class="playerHealth">
-			<div class="miniBox"> </div>
-			<div class="miniBox"> </div>
-			<div class="miniBox"> </div>			
-		</div>
-		<div class="enemyHealth">
-			<div class="redBox">
+	<div class="submenu">
+		<div class="submenu width-150">
+			<div class="title">
+				<p>Lives</p>
+			</div>
+			<div class="title">
+				<p style="color: red">Enemy</p>
 			</div>
 		</div>
+		<div class="submenu width-200">
+			<div class="description playerHealth">
+				<div class="miniBox"></div>
+				<div class="miniBox"></div>
+				<div class="miniBox"></div>
+			</div>
+			<div class="description">
+				<div class="redBox">
+				</div>
+			</div>
 		</div>
 	</div>
-	<div class="submenu score">
-		<p class="score">1</p>
+
+
+	<div class="submenu">
+		<div class="submenu width-150">
+			<div class="score">
+				<p>1</p>
+			</div>
+			<div class="gameplay">
+				<p>GamePlay</p>
+			</div>
+		</div>
+		<div class="submenu width-200">
+			<div class="description">
+				<p>Weapons:</p>
+			</div>
+			<div class="description">
+				<p>Inventory:</p>
+			</div>
+		</div>
 	</div>
-	<div class="submenu gameplay">
-		<p>Gameplay</p>
+
+	<div class="submenu">
+		<div class="submenu height-50 width-325">
+			<div class="item"></div>
+			<div class="item"></div>
+			<div class="item"></div>
+		</div>
+		<div class="submenu height-50 width-325">
+			<div class="item"></div>
+			<div class="item"></div>
+			<div class="item"></div>
+		</div>
 	</div>
 </div>
 
