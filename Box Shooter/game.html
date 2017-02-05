@@ -10,25 +10,36 @@
 <body>
 <div class="grid">
 	<div class="instructions">
-		<p>Destroy the enemy orb. You will lose health if you come into contact with the orb. Use the arrow keys to move and space bar to fire.  The orb will move faster with each level.<br>
-		You will be unable to move for a brief period after firing.
-		</p>
+		<div class="submenu width-500 height-150">
+			<p>Destroy the enemy object.  You will take damage if you come into contact. </p>
+		</div>
+		<div class="submenu width-500 height-50">
+			<p>Use the arrow keys to move.</p>
+		</div>
+		<div class="submenu width-500 height-50">
+			<p>Press space bar to fire.</p>
+		</div>
+		<div class="submenu width-500 height-50">
+			<p>Press 's' to select between available weapons.</p>
+		</div>
+		<div class="submenu width-200"></div>
+		<div class="submenu width-250"></div>
 	</div>
-	<div class="box">
+	<div class="player">
 	<img src="images/Hazard Orb.png" alt="">
 	</div>
 	<div class="enemy">
 	<img src="images/Enemy.png" alt="" class="orb">
 	</div>
 	<div class="notification">
-		<p>Failure</p>
+		<p>Gameover</p>
 	</div>
 	<img src="images/Explosion Default.png" alt="Explosion" width="100" class="effects">
 </div>
 <div class="menu">
 
 	<div class="submenu">
-		<div class="submenu width-150">
+		<div class="submenu width-100">
 			<div class="title">
 				<p>Lives</p>
 			</div>
@@ -36,7 +47,7 @@
 				<p style="color: red">Enemy</p>
 			</div>
 		</div>
-		<div class="submenu width-200">
+		<div class="submenu width-150">
 			<div class="description playerHealth">
 				<div class="miniBox"></div>
 				<div class="miniBox"></div>
@@ -56,7 +67,7 @@
 				<p>1</p>
 			</div>
 			<div class="gameplay">
-				<p>GamePlay</p>
+				<p>Gameplay</p>
 			</div>
 		</div>
 		<div class="submenu width-200">
@@ -86,10 +97,10 @@
 				<p>---</p>
 			</div>
 			<div class="item">
-				<p>x10</p>
+				<p class="missileAmmo">x10</p>
 			</div>
 			<div class="item">
-				<p>x10</p>
+				<p class="laserAmmo">x10</p>
 			</div>
 		</div>
 	</div>

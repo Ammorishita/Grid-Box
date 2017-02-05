@@ -5,7 +5,7 @@ p {
   margin: 0;
   padding: 0; }
 
-.box {
+.player {
   width: 100px;
   height: 100px;
   position: absolute;
@@ -46,7 +46,7 @@ p {
 
 .gameplay {
   color: red;
-  font-size: 24px;
+  font-size: 32px;
   width: 100px;
   height: 50px;
   margin: auto;
@@ -76,18 +76,19 @@ p {
   position: absolute; }
 
 .instructions {
-  width: 500px;
-  height: 300px;
+  width: 550px;
+  height: 650px;
   border: 3px solid Cyan;
   margin: auto;
   position: absolute;
   z-index: 1000;
   background-color: black;
-  opacity: .8;
-  display: none;
+  display: flex;
+  opacity: 0;
+  flex-wrap: wrap;
   color: Dodgerblue;
   left: 250px;
-  top: 250px;
+  top: 0px;
   text-align: center; }
   .instructions p {
     font-size: 24px;
@@ -129,7 +130,7 @@ p {
   width: 30px;
   height: 30px;
   background-color: DodgerBlue;
-  margin: 10px;
+  margin: 4px;
   display: inline-block;
   opacity: 1;
   position: relative; }
@@ -171,10 +172,20 @@ p {
   height: 100px;
   width: 350px;
   display: flex;
-  flex-wrap: wrap; }
+  flex-wrap: wrap;
+  border: 1px solid red; }
 
 .height-50 {
   height: 50px; }
+
+.height-150 {
+  height: 150px; }
+
+.width-500 {
+  width: 500px; }
+
+.width-350 {
+  width: 350px; }
 
 .width-325 {
   width: 325px; }
