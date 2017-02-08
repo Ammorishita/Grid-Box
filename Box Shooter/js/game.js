@@ -335,25 +335,94 @@ var game = {
         var enemy = $('.enemy');
             enemyX = $('.enemy').css('left');
             enemyY = $('.enemy').css('top');
-        /*var timer = setInterval(function() {
-            move();
-            attack();      
-            console.log('the current move speed is' + levelUp[0].speed)
-        },400);*/
         var speedInterval = function() {
             move();
+            attack();
             var speed = levelUp[0].speed;
             clearInterval(timer)
             timer = setInterval(speedInterval, speed)
         };
         var timer = setInterval(speedInterval, levelUp[0].speed)
 
+        var Weapon = function(src) {
+            var box = document.querySelector('.enemy');
+            var styleTop = window.getComputedStyle(box, null).getPropertyValue('top');
+            var styleLeft = window.getComputedStyle(box, null).getPropertyValue('left');
+            var choice = Math.random();
+            this.element = document.createElement('div');
+            this.element.className += "enemyWeapon";
+            this.element.style.left = styleLeft;
+            this.element.style.top = styleTop;
+            this.img = document.createElement('img');
+            this.img.setAttribute("height", "100");
+            this.img.setAttribute("src", src);
+            this.element.prepend(this.img);
+            this.update();
+            this.x = parseInt(this.element.style.left);
+            if(choice > .5) {
+                $('.grid').append(this.element);   
+            } else {
+                return
+            }
+        };
+        Weapon.prototype.update = function() {
+            $('.enemyWeapon').animate({
+                'left' : '0px'
+            },1500,'linear')
+            this.render();
+            this.collide();
+        };
+        Weapon.prototype.collide = function() {           
+            var id;
+            function collide() {
+                var el = document.querySelector('.enemyWeapon');
+                var player = document.querySelector('.player')
+                var rect = el.getBoundingClientRect();
+                var enemyX = rect.left;
+                var enemyY = rect.top;
+                var playerX = parseInt($('.player').css('left'));
+                var playerY = parseInt($('.player').css('top'));
+                console.log('ITS RUNNING RIGHT NOW')
+                id = requestAnimationFrame(collide);
+                if((enemyY <= playerY + 20) && (enemyY >= playerY - 20) && (enemyX <= playerX + 99) && (enemyX >= playerX - 99)) {
+                    var playerLives = $('.playerHealth').find('.miniBox').length;
+                    if(playerLives == 1) {
+                        console.log('CLEARING EVERYTHING')
+                        game.reset();
+                        levelUp[0].gameover = true;
+                    }
+                    var lives = document.querySelector('.miniBox');
+                    lives.remove();
+                    console.log('one life has been removed')
+                    cancelAnimationFrame(id)
+                }
+            }
+            requestAnimationFrame(collide)            
+        };
+        Weapon.prototype.render = function() {
+            var weapon = document.querySelectorAll('div.enemyWeapon')
+            var el = document.querySelector('.enemyWeapon');
+            var player = document.querySelector('.player')
+            var posX = parseInt(player.style.left);
+            if(el) {
+                for (i=0; i<weapon.length; i++) {
+                    if(weapon[i].style.left == '0px') {
+                        weapon[i].remove();                 
+                    }
+                }
+            }
+        };
+        function attack() {
+            if(pause) {return}
+            var enemy = new Weapon('images/Black Hole.png')
+        };
+
         function move() {
             if (pause == true) {return};
-            console.log('MOVE IS RUNNING')
             var newEnemyX = parseInt(enemyX);
             var newEnemyY = parseInt(enemyY);
             var choice = Math.floor(Math.random() * 4);
+            console.log(choice)
             if (choice == 0) {enemy.css({'left' : '-=100px'})}
             if (choice == 1) {enemy.css({'left' : '+=100px'})}
             if (choice == 2) {enemy.css({'top' : '-=100px'})}
@@ -373,9 +442,8 @@ var game = {
                 }
             }
             //If enemy at right side of the grid will move left or down.
-            if (choice == 1 && newEnemyX > 800) {
+            if (choice == 1 && newEnemyX == 800) {
                 var secondChoice = Math.floor(Math.random() * 2);
-                console.log(secondChoice)
                 if(secondChoice == 1 && newEnemyY  < 500) {
                     enemy.css({'top' : '+=100px'});                           
                 } else {
@@ -383,8 +451,6 @@ var game = {
                 }
             }
             game.collision();
-        };
-        function attack() {
         };
 
     },
@@ -412,11 +478,11 @@ var game = {
         pause = true;
         levelUp[0].pause = true;
         levelUp[0].speed = 400;
-        for ( var i=0; i<3; i++) {
+        for (var i=0; i<16; i++) {
             var lives = $('<div>', {
                 'class' : 'miniBox'
             });
-            $('.playerHealth').append(lives);
+            $('.playerHealth').append(lives)
         }
     },
     collision: function() {
@@ -426,7 +492,9 @@ var game = {
         enemyX = $('.enemy').css('left');
         boxY = $('.player').css('top');
         boxX = $('.player').css('left');
-        if (boxY == enemyY && boxX == enemyX) {
+        var enemyWeaponX = $('.enemyWeapon').css('left')
+        var enemyWeaponY = $('.enemyWeapon').css('top')
+        if ((boxY == enemyY && boxX == enemyX)) {
             //Collision detection
             var playerLives = $('.playerHealth').find('.miniBox').length;
             if(playerLives == 1) {
@@ -441,11 +509,11 @@ var game = {
             //If you damage the enemy
             if ($('.laser').hasClass('selected')) {
                 $('.redBox').css({
-                    'width' : '-=150px'
+                    'width' : '-=50px'
                 });                
             } else {
                 $('.redBox').css({
-                    'width' : '-=150px'
+                    'width' : '-=50px'
                 }); 
             }
             game.effects();
@@ -465,7 +533,7 @@ var game = {
             if(enemyHealthInt == 0) {
                 //Enemy is defeated
                 levelUp[0].speed -= 50;
-                if(levelUp[0].speed == 100) {levelUp[0].speed = 150}
+                if(levelUp[0].speed == 150) {levelUp[0].speed = 200}
                     console.log(levelUp[0].speed)
                 var level = levelUp[0].level;
                 var currentLevel = level += 1;

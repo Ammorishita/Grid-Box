@@ -43,6 +43,20 @@ p {
 	position: absolute;
 	left: 900px;
 	top: 300px;
+	z-index: 10;
+}
+.enemyWeapon {
+	width: 98px;
+	height: 98px;
+	border: 2px solid red;
+	position: absolute;
+	transition-property: transform;
+	transition-duration: 4s;
+	animation-name: rotate;
+	animation-duration: 4s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	z-index: 1;
 }
 .gameplay {
 	color: red;
@@ -131,10 +145,10 @@ p {
 	position: relative;
 }
 .miniBox {
-	width: 30px;
+	width: 2px;
 	height: 30px;
 	background-color: DodgerBlue;
-	margin: 4px;
+	margin: 1px;
 	display: inline-block;
 	opacity: 1;
 	position: relative;
@@ -158,8 +172,8 @@ p {
 	height: 35px;
 	margin: 5px 0px;
 }
-.playerHealth {
-
+.player {
+	z-index: 1000;
 }
 .score {
 	width: 100px;
