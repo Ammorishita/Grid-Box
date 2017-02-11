@@ -134,6 +134,17 @@ p {
 	height: 98px;
 	width: 98px;
 }
+.laserItem, .missileItem {
+	width: 98px;
+	height: 98px;
+	position: absolute;
+	transition-property: transform;
+	transition-duration: 8s;
+	animation-name: rotate;
+	animation-duration: 8s;
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+}
 .menu {
 	width: 1000px;
 	height: 100px;

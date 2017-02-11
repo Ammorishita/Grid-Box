@@ -76,6 +76,12 @@ var effects = [
         'src' : 'images/Explosion6.png'
     },
 ];
+var weaponAmmo = [
+    {
+        'missile' : 10,
+        'laser' : 5
+    }
+];
 var levelUp = [
     {
         'speed' : 400,
@@ -247,10 +253,12 @@ var game = {
                 var box = document.querySelector('.player');
                 var styleTop = window.getComputedStyle(box, null).getPropertyValue('top');
                 var styleLeft = window.getComputedStyle(box, null).getPropertyValue('left');
+                var currentPos = parseInt(styleLeft)
                 projectile[0].style.top = styleTop;
                 projectile[0].style.left = styleLeft;
 
                 function plasmaAttack() {
+                    $('.grid').append(projectile);
                     var audio;
 
                     if($('.missile').hasClass('selected')) {
@@ -266,11 +274,20 @@ var game = {
                     }
                     $('.grid').append(projectile);
                     var interval = setInterval(function() {
-                        if($('.player').hasClass('attackingLeft')) {
+                        if($('.player').hasClass('attackingLeft') && currentPos > 0) {
+                            projectile[0].className += ' rotate';
                             $('.gridBoxMini').css({'left' : '-=100px'});
-                        } else {
+                        } else if($('.player').hasClass('attackingRight') && currentPos < 900) {
                             $('.gridBoxMini').css({'left' : '+=100px'});
+                        } else if ($('.player').hasClass('attackingRight') && currentPos == 900) {
+                            projectile[0].className += ' rotate';
+                            $('.gridBoxMini').css({'left' : '-=100px'});
+                        } else if ($('.player').hasClass('attackingLeft') && currentPos == 0) {
+                            $('.gridBoxMini').css({'left' : '+=100px'});
+                        } else {
+                            $('.gridBoxMini').css({'left' : '+=100px'}); 
                         }
+
                         var projectileX = $('.gridBoxMini').css('left');
                         var projectileXInt = parseInt(projectileX);
                         var projectileY = $('.gridBoxMini').css('top');
@@ -315,7 +332,10 @@ var game = {
                         'left' : '0px',
                         'top' : styleTop
                     });
-                    if($('.player').hasClass('attackingLeft')) {
+                    if(currentPos == 0) {
+                        $('.player').removeClass('attackingLeft')
+                    }
+                    if($('.player').hasClass('attackingLeft') || currentPos == 900) {
                         $('.grid').append(laserReverse);
                         for(i=0; i<(currentPos/100)+1; i++) {
                             (function(i) {
@@ -337,6 +357,7 @@ var game = {
                                     game.collision();
                                     currentPosReverse--
                                     if(currentPosReverse == -1) {
+                                        console.log('we are out of ammo laser')
                                         clearInterval(laserCount)
                                         laserReverse.remove();
                                         $('.gridBoxMini').remove();
@@ -346,7 +367,7 @@ var game = {
                                 },50 * i)
                             }(i));
                         }                          
-                    } else {
+                    } else if ($('.player').hasClass('attackingRight') || currentPos == 0) {
                         $('.grid').append(laser);
                         var laserCount = setInterval(function() {
                             laser.prepend('<img class="weapon4">');
@@ -371,19 +392,33 @@ var game = {
 
                 if($('.plasma').hasClass('selected')) {
                     projectile.prepend('<img class="weapon2">');
-                    if($('.player').hasClass('attackingLeft')) {                       
-                       projectile[0].className += ' rotate';
-                    }
                     plasmaAttack();
-
                 } else if ($('.missile').hasClass('selected')) {
-                    projectile.prepend('<img class="weapon3">');
-                    if($('.player').hasClass('attackingLeft')) {                       
-                       projectile[0].className += ' rotate';
+                    var currentMissileAmmo = weaponAmmo[0].missile-=1
+                    if(currentMissileAmmo == -1) {
+                        weaponAmmo[0].missile+=1;
+                        document.onkeydown = checkKey;
+                        document.addEventListener('keydown', attacking, false);
+                        return
+                    } else {
+                        $('.missileAmmo').html('x' + currentMissileAmmo)
+                        projectile.prepend('<img class="weapon3">');
+                        if($('.player').hasClass('attackingLeft')) {                       
+                           projectile[0].className += ' rotate';
+                        }
+                        plasmaAttack();                       
                     }
-                    plasmaAttack();
                 } else if ($('.laser').hasClass('selected')) {
-                    laserAttack();
+                    var currentLaserAmmo = weaponAmmo[0].laser-=1
+                    if(currentLaserAmmo == -1) {
+                        weaponAmmo[0].laser+=1;
+                        document.onkeydown = checkKey;
+                        document.addEventListener('keydown', attacking, false);
+                        return
+                    } else {
+                    $('.laserAmmo').html('x' + currentLaserAmmo)
+                    laserAttack();                    
+                    }
                 }
             }
         }
@@ -482,6 +517,7 @@ var game = {
             var newEnemyX = parseInt(enemyX);
             var newEnemyY = parseInt(enemyY);
             var choice = Math.floor(Math.random() * 4);
+            var itemChoice = Math.random();
             if (choice == 0) {enemy.css({'left' : '-=100px'})}
             if (choice == 1) {enemy.css({'left' : '+=100px'})}
             if (choice == 2) {enemy.css({'top' : '-=100px'})}
@@ -490,6 +526,30 @@ var game = {
             if (choice == 1 && newEnemyX > 800) {enemy.css({'left' : '-=100px'})}
             if (choice == 2 && newEnemyY < 100) {enemy.css({'top' : '+=100px'})}
             if (choice == 3 && newEnemyY > 500) {enemy.css({'top' : '-=100px'})}
+            if (itemChoice > .97) {
+                var laserPickUp = $('<img>', {
+                    'class' : 'laserItem',
+                    'src' : 'images/LaserBeam.png',
+                    'width' : 100
+                });
+                var missilePickUp = $('<img>', {
+                    'class' : 'missileItem',
+                    'src' : 'images/Missile1.png',
+                    'width' : 100
+                });
+                var randomY = (Math.floor((Math.random()*7))*100);
+                var randomX = (Math.floor((Math.random()*10))*100);
+                laserPickUp[0].style.top = randomY + 'px';
+                laserPickUp[0].style.left = randomX + 'px';
+                missilePickUp[0].style.top = randomY + 'px';
+                missilePickUp[0].style.left = randomX + 'px';
+                var finalChoice = Math.random();
+                if(finalChoice >= .5) {                   
+                    $('.grid').append(laserPickUp)
+                } else {
+                    $('.grid').append(missilePickUp)
+                }
+            }
             //If enemy is at left side of the grid, moves down or left.
             if (choice == 0 && newEnemyX < 100) {
                 var secondChoice = Math.floor(Math.random() * 2);
@@ -555,18 +615,29 @@ var game = {
         enemyX = $('.enemy').css('left');
         boxY = $('.player').css('top');
         boxX = $('.player').css('left');
-        var enemyWeaponX = $('.enemyWeapon').css('left')
-        var enemyWeaponY = $('.enemyWeapon').css('top')
+        var laserItem = document.querySelectorAll('.laserItem')
+        var missileItem = document.querySelectorAll('.missileItem')
+        if(laserItem) {
+            for (i=0; i<laserItem.length; i++) {
+                if(boxY == laserItem[i].style.top && boxX == laserItem[i].style.left) {  
+                    var currentLaserAmmo = weaponAmmo[0].laser+=5;
+                    $('.laserAmmo').html('x' + currentLaserAmmo) 
+                    laserItem[i].remove();         
+                }
+            } 
+        }      
+        if (missileItem) {
+            for (i=0; i<missileItem.length; i++) {
+                if(boxY == missileItem[i].style.top && boxX == missileItem[i].style.left) {  
+                    var currentMissileAmmo = weaponAmmo[0].missile+=10;
+                    $('.missileAmmo').html('x' + currentMissileAmmo) 
+                    missileItem[i].remove();         
+                }
+            }   
+        }
+        var enemyWeaponX = $('.enemyWeapon').css('left');
+        var enemyWeaponY = $('.enemyWeapon').css('top');
         if ((boxY == enemyY && boxX == enemyX)) {
-            //Collision detection
-            /*var playerLives = $('.playerHealth').find('.miniBox').length;
-            if(playerLives == 1) {
-                console.log('CLEARING EVERYTHING')
-                game.reset();
-                levelUp[0].gameover = true;
-            }
-            var lives = document.querySelector('.miniBox');
-            lives.remove();*/
             console.log('collided with the box')
             $('.miniBox').css({
                 'width' : '-=5px'
@@ -582,22 +653,30 @@ var game = {
             //If you damage the enemy
             if ($('.laser').hasClass('selected')) {
                 $('.redBox').css({
-                    'width' : '-=50px'
+                    'width' : '-=20px'
                 });                
+            } else if ($('.missile').hasClass('selected')) {
+                $('.redBox').css({
+                    'width' : '-=15px'
+                });    
             } else {
                 $('.redBox').css({
-                    'width' : '-=50px'
+                    'width' : '-=10px'
                 }); 
             }
             game.effects();
             if(pause == true) {
                 if($('.laser').hasClass('selected')) {
                     $('.redBox').css({
-                        'width' : '+=50px'
+                        'width' : '+=20px'
                     });  
-                } else {
+                } else if ($('.missile').hasClass('selected')) {
                     $('.redBox').css({
-                        'width' : '+=50px'
+                        'width' : '+=15px'
+                    });
+                }  else {
+                    $('.redBox').css({
+                        'width' : '+=10px'
                     });
                 }
             }
