@@ -286,7 +286,7 @@ var game = {
                             $('.gridBoxMini').css({'left' : '+=100px'});
                         } else {
                             $('.gridBoxMini').css({'left' : '+=100px'}); 
-                        }
+                        } 
 
                         var projectileX = $('.gridBoxMini').css('left');
                         var projectileXInt = parseInt(projectileX);
@@ -317,7 +317,6 @@ var game = {
                     var length = (totalLength - currentPos) - 100;
                     var laserLength = (length / 100);
                     var laserStyleLeft = parseInt(styleLeft) + 100 + 'px'
-                    var laserStyleReverseLeft = totalLength - currentPos;
                     document.onkeydown = disable;
                     function disable(e) {
                         e = e || window.event;
@@ -403,7 +402,7 @@ var game = {
                     } else {
                         $('.missileAmmo').html('x' + currentMissileAmmo)
                         projectile.prepend('<img class="weapon3">');
-                        if($('.player').hasClass('attackingLeft')) {                       
+                        if($('.player').hasClass('attackingLeft') && currentPos > 0) {                       
                            projectile[0].className += ' rotate';
                         }
                         plasmaAttack();                       
@@ -417,7 +416,7 @@ var game = {
                         return
                     } else {
                     $('.laserAmmo').html('x' + currentLaserAmmo)
-                    laserAttack();                    
+                        laserAttack();                    
                     }
                 }
             }
@@ -443,46 +442,66 @@ var game = {
             var styleTop = window.getComputedStyle(box, null).getPropertyValue('top');
             var styleLeft = window.getComputedStyle(box, null).getPropertyValue('left');
             var choice = Math.random();
+            var directionChoice = Math.random();
             this.element = document.createElement('div');
             this.element.className += "enemyWeapon";
+            if(directionChoice > .5) {
+                this.element.className += " enemyWeaponRight";
+            } else if(directionChoice <= .5) {             
+                this.element.className += " enemyWeaponLeft";
+            }
             this.element.style.left = styleLeft;
             this.element.style.top = styleTop;
-            this.img = document.createElement('img');
+             this.img = document.createElement('img');
             this.img.setAttribute("height", "100");
             this.img.setAttribute("src", src);
             this.element.prepend(this.img);
-            this.update();
             this.x = parseInt(this.element.style.left);
+            this.update();
             if(choice > .7) {
-                $('.grid').append(this.element);   
+                $('.grid').append(this.element);
+                console.log('firing weapon')   
             } else {
                 return
             }
         };
         Weapon.prototype.update = function() {
             var distance = parseInt(this.element.style.left)
-            var spp = distance / (.5);
-            $('.enemyWeapon').animate({
+            var gridWidth = parseInt($('.grid').css('width'));
+            var dif = gridWidth - distance;
+            var spp = distance * 2;
+            var spp2 = dif * 2;
+            var direction = Math.random();
+            $('.enemyWeaponLeft').animate({
                 'left' : '0px'
-            },spp,'linear')
-            this.render();
+            },spp,'linear'); 
+            $('.enemyWeaponRight').animate({
+                'left' : '900px'
+            },spp2, 'linear');            
             this.collide();
+            this.render();
         };
-        Weapon.prototype.collide = function() {           
+        Weapon.prototype.collide = function() { 
+        //Collision detection for player and enemy weapon.          
             var id;
             function collide() {
                 var el = document.querySelector('.enemyWeapon');
                 var player = document.querySelector('.player')
                 if(el) {
                     var rect = el.getBoundingClientRect();
-                    var enemyX = rect.left;
-                    var enemyY = rect.top;
-                    var playerX = parseInt($('.player').css('left'));
-                    var playerY = parseInt($('.player').css('top'));
+                    var enemyLeft = window.getComputedStyle(el, null).getPropertyValue('left');
+                    var enemyTop = window.getComputedStyle(el, null).getPropertyValue('top');
+                    var styleTop = window.getComputedStyle(player, null).getPropertyValue('top');
+                    var styleLeft = window.getComputedStyle(player, null).getPropertyValue('left');
+                    var enemyX = parseInt(enemyLeft);
+                    var enemyY = parseInt(enemyTop)
+                    var playerX = parseInt(styleLeft);
+                    var playerY = parseInt(styleTop);
+                    console.log(playerX, playerY, enemyX, enemyY)
                     id = requestAnimationFrame(collide);
                     if((enemyY <= playerY + 20) && (enemyY >= playerY - 20) && (enemyX <= playerX + 99) && (enemyX >= playerX - 99)) {
                         console.log('you are taking damage')
-                        $('.miniBox').css({'width' : '-=5px'})
+                        $('.miniBox').css({'width' : '-=10px'})
                         if($('.miniBox').css('width') == '0px') {
                             game.reset();
                             $('.enemyWeapon').remove();
@@ -495,13 +514,14 @@ var game = {
             requestAnimationFrame(collide)            
         };
         Weapon.prototype.render = function() {
+            //Removes enemy projectiles when they reach the end of the grid.
             var weapon = document.querySelectorAll('div.enemyWeapon')
             var el = document.querySelector('.enemyWeapon');
             var player = document.querySelector('.player')
             var posX = parseInt(player.style.left);
             if(el) {
                 for (i=0; i<weapon.length; i++) {
-                    if(weapon[i].style.left == '0px') {
+                    if(weapon[i].style.left == '0px' || weapon[i].style.left == '900px') {
                         weapon[i].remove();                 
                     }
                 }
@@ -509,9 +529,8 @@ var game = {
         };
         function attack() {
             if(pause) {return}
-            var enemy = new Weapon('images/Black Hole.png')
+            var enemy = new Weapon('images/Sun.png')
         };
-
         function move() {
             if (pause == true) {return};
             var newEnemyX = parseInt(enemyX);
@@ -526,6 +545,7 @@ var game = {
             if (choice == 1 && newEnemyX > 800) {enemy.css({'left' : '-=100px'})}
             if (choice == 2 && newEnemyY < 100) {enemy.css({'top' : '+=100px'})}
             if (choice == 3 && newEnemyY > 500) {enemy.css({'top' : '-=100px'})}
+            //The chance of an item appearing.
             if (itemChoice > .97) {
                 var laserPickUp = $('<img>', {
                     'class' : 'laserItem',
@@ -546,14 +566,19 @@ var game = {
                 var finalChoice = Math.random();
                 if(finalChoice >= .5) {                   
                     $('.grid').append(laserPickUp)
+                    setTimeout(function() {
+                        laserPickUp.remove();
+                    },3000)
                 } else {
                     $('.grid').append(missilePickUp)
+                    setTimeout(function() {
+                        missilePickUp.remove();
+                    },4000)
                 }
             }
             //If enemy is at left side of the grid, moves down or left.
             if (choice == 0 && newEnemyX < 100) {
                 var secondChoice = Math.floor(Math.random() * 2);
-                console.log(secondChoice)
                 if(secondChoice == 1 && newEnemyY  < 500) {
                     enemy.css({'top' : '+=100px'});                           
                 } else {
@@ -582,12 +607,13 @@ var game = {
                 'opacity' : '0'
             },500)
         },1000)
-        $('.score').html('<p class="score">' + 1 + '</p>');
+        $('.score').html('<p class="score"> Level: ' + 1 + '</p>');
         $('.enemy').css({
             'left' : '900px',
             'top' : '300px'
         });
-        $('.redBox').css({
+        $('.enemyWeapon').remove();
+        $('.enemyHealth').css({
             'width' : '150px'
         });
         $('.player').css({
@@ -617,6 +643,7 @@ var game = {
         boxX = $('.player').css('left');
         var laserItem = document.querySelectorAll('.laserItem')
         var missileItem = document.querySelectorAll('.missileItem')
+        //If you pick up weapons
         if(laserItem) {
             for (i=0; i<laserItem.length; i++) {
                 if(boxY == laserItem[i].style.top && boxX == laserItem[i].style.left) {  
@@ -635,15 +662,12 @@ var game = {
                 }
             }   
         }
-        var enemyWeaponX = $('.enemyWeapon').css('left');
-        var enemyWeaponY = $('.enemyWeapon').css('top');
+        //If you collide with the enemy.
         if ((boxY == enemyY && boxX == enemyX)) {
-            console.log('collided with the box')
             $('.miniBox').css({
-                'width' : '-=5px'
+                'width' : '-=25px'
             })
             if($('.miniBox').css('width') == '0px') {
-                console.log('lost all health')
                 game.reset();
                 levelUp[0].gameover = true;
             }
@@ -652,35 +676,35 @@ var game = {
             console.log('colision detected')
             //If you damage the enemy
             if ($('.laser').hasClass('selected')) {
-                $('.redBox').css({
+                $('.enemyHealth').css({
                     'width' : '-=20px'
                 });                
             } else if ($('.missile').hasClass('selected')) {
-                $('.redBox').css({
+                $('.enemyHealth').css({
                     'width' : '-=15px'
                 });    
             } else {
-                $('.redBox').css({
+                $('.enemyHealth').css({
                     'width' : '-=10px'
                 }); 
             }
             game.effects();
             if(pause == true) {
                 if($('.laser').hasClass('selected')) {
-                    $('.redBox').css({
+                    $('.enemyHealth').css({
                         'width' : '+=20px'
                     });  
                 } else if ($('.missile').hasClass('selected')) {
-                    $('.redBox').css({
+                    $('.enemyHealth').css({
                         'width' : '+=15px'
                     });
                 }  else {
-                    $('.redBox').css({
+                    $('.enemyHealth').css({
                         'width' : '+=10px'
                     });
                 }
             }
-            var enemyHealth = $('.redBox').css('width');
+            var enemyHealth = $('.enemyHealth').css('width');
             var enemyHealthInt = parseInt(enemyHealth);
             if(enemyHealthInt == 0) {
                 //Enemy is defeated
@@ -688,7 +712,7 @@ var game = {
                 if(levelUp[0].speed == 150) {levelUp[0].speed = 200}
                 var currentLevel = levelUp[0].level += 1;
                 console.log('The crurrent level is' + currentLevel)
-                $('.score').html('<p class="score">' + currentLevel + '</p>');
+                $('.score').html('<p class="score">' + 'Level: ' + currentLevel + '</p>');
                 $('.enemy').css({
                     'left' : '900px',
                     'top' : '300px'
@@ -698,7 +722,7 @@ var game = {
                     'left' : '0px'
                 });
                 setTimeout(function() {
-                    $('.redBox').css({
+                    $('.enemyHealth').css({
                         'width' : '150px'
                     })
                 },50)
@@ -710,18 +734,10 @@ var game = {
         var newBoxX = parseInt(boxX);
         var newBoxY = parseInt(boxY);
 
-        if(newBoxX > 900) {
-            $('.player').css({'left' : '-=100px'});
-        }
-        if(newBoxX < 0) {
-            $('.player').css({'left' : '+=100px'});
-        }
-        if(newBoxY < 0) {
-            $('.player').css({'top' : '+=100px'});
-        }
-        if(newBoxY > 600) {
-            $('.player').css({'top' : '-=100px'});
-        }
+        if(newBoxX > 900) {$('.player').css({'left' : '-=100px'})}
+        if(newBoxX < 0) {$('.player').css({'left' : '+=100px'})}
+        if(newBoxY < 0) {$('.player').css({'top' : '+=100px'})}
+        if(newBoxY > 600) {$('.player').css({'top' : '-=100px'})}
     }
 };
 game.init();
