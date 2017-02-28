@@ -620,6 +620,8 @@ var game = {
             'top' : '300px',
             'left' : '0px'
         });
+        $('.missileAmmo').html('x' + 10)
+        $('.laserAmmo').html('x' + 5)
         pause = true;
         levelUp[0].pause = true;
         levelUp[0].speed = 400;
